@@ -1,0 +1,22 @@
+.fadeIn {
+    animation: grow .5s;
+}
+
+@keyframes grow {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.player1 {
+    stroke: #32BBFA;
+}
+
+.player2 {
+    stroke: #FA7132;
+}

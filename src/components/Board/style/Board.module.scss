@@ -1,0 +1,66 @@
+.fadeIn {
+    animation: grow 1s;
+}
+
+@keyframes grow {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.grid {
+    stroke: #333;
+    opacity: 0.75;
+    stroke-linecap: initial;
+}
+
+.gridBlue {
+    stroke: #008ecf;
+}
+
+.gridOrange {
+    stroke: #d64400;
+}
+
+.blue {
+    background-color: #32BBFA;
+}
+
+.orange {
+    background-color: #FA7132;
+}
+
+.green {
+    background-color: green;
+}
+
+.board {
+    border: 5px solid black;
+    transition: .5s ease;
+
+    rect {
+        fill: rgba(255, 255, 255, 0.6);
+    }
+
+    g {
+        cursor: pointer;
+    }
+
+    line, circle {
+        stroke-width: 8;
+        cursor: default;
+    }
+
+    line {
+        stroke-linecap: round;
+    }
+
+    circle {
+        fill: none;
+    }
+}

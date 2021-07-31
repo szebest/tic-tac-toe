@@ -29,6 +29,7 @@ const Game = () => {
                     o: prev.o + 1
                 }
             })
+            
         setGameState(message)
     }
 
@@ -44,6 +45,7 @@ const Game = () => {
     }
 
     useEffect(() => {
+        setPlayerMove(1)
         setScore({x: 0, o: 0})
         setGameState("")
         setRestartGame(true) 

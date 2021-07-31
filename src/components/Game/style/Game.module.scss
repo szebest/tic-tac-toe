@@ -51,7 +51,7 @@
     color: yellow;
     border-radius: 20px;
     border-color: white;
-    font-size: 50px;
+    font-size: clamp(30px, 4vw, 50px);
 }
 
 .scoreContainer {

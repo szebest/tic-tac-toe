@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import classes from './style/Board.module.scss'
 import Tile from '../Tile/Tile'
 
-const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, finishedGame }) => {
+const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, finishedGame, vsAI }) => {
     const CELL_SIZE = 100
 
     const [board, setBoard] = useState(Array(9).fill(0))
@@ -53,6 +53,26 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
         
         return false
     }
+
+    useEffect(() => {
+        if (vsAI && playerMove === 2) {
+            let hasMoved = false
+            while (!hasMoved) {
+                let index = Math.floor(Math.random() * 8)
+                if (board[index] === 0) {
+                    hasMoved = true
+                    
+                    setBoard(prev => {
+                        prev[index] = playerMove
+                        return prev
+                    })
+            
+                    if (!checkBoardState(index))
+                        changeGameStateFunction()
+                }
+            }
+        }
+    }, [playerMove])
 
     const handleClick = async (e) => {
         if (!canPlace)

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import classes from './style/Game.module.scss'
 import Board from '../Board/Board'
 
@@ -7,6 +7,7 @@ const Game = () => {
     const [playerMove, setPlayerMove] = useState(1)
     const [gameState, setGameState] = useState("")
     const [score, setScore] = useState({x: 0, o: 0})
+    const [vsAI, setVsAI] = useState(null)
 
     const changeGameState = () => {
         setRestartGame(false)
@@ -31,32 +32,57 @@ const Game = () => {
         setGameState(message)
     }
 
-    const newGame = () => {
+    const restart = () => {
         setPlayerMove(1)
         setGameState("")
         setRestartGame(true)
+        setScore({x: 0, o: 0})
     }
 
-    return (
-        <div className={classes.gameContainer}>
-            <div className={classes.scoreContainer}>
-                <p>x: {score.x}</p>
-                <p>o: {score.o}</p>
+    const resetAI = () => {
+        setVsAI(null)
+    }
+
+    useEffect(() => {
+        setScore({x: 0, o: 0})
+        setGameState("")
+        setRestartGame(true) 
+    }, [vsAI])
+
+    if (vsAI !== null)
+        return (
+            <div className={classes.gameContainer}>
+                <div className={classes.scoreContainer}>
+                    <div>
+                        <p>{vsAI ? "Player vs AI" : "Player vs Player"}</p>
+                    </div>
+                    <div className={classes.flex}>
+                        <p>x: {score.x}</p>
+                        <p>o: {score.o}</p>
+                    </div>
+                </div>
+                <Board
+                    restartGame={restartGame}
+                    canPlace={gameState === ""}
+                    playerMove={playerMove} 
+                    changeGameStateFunction={changeGameState}
+                    finishedGame={finishedGame}
+                    vsAI={vsAI}/>
+                <h1 className={classes.infoText}>{gameState === "" ? (playerMove === 1 ? "Players 1 move" : "Players 2 move") : gameState}</h1>
+                <div className={classes.buttonContainer}>
+                    <button className={`${classes.button} ${classes.buttonPrimary}`} onClick={restart}>Restart</button>
+                    <button className={`${classes.button} ${classes.buttonPrimary}`} onClick={resetAI}>Change game mode</button>
+                </div>
             </div>
-            <Board
-                restartGame={restartGame}
-                canPlace={gameState === ""}
-                playerMove={playerMove} 
-                changeGameStateFunction={changeGameState}
-                finishedGame={finishedGame}/>
-            <h1 className={classes.infoText}>{gameState === "" ? (playerMove === 1 ? "Players 1 move" : "Players 2 move") : gameState}</h1>
-            <div className={classes.buttonContainer}>
-                {gameState !== "" && <button className={`${classes.button} ${classes.buttonPrimary}`} onClick={newGame}>New game</button>}
-                {/*add functionality to changing mode later, when there will be more game modes*/}
-                {/*gameState !== "" && <button className={`${classes.button} ${classes.buttonPrimary}`}>Change game mode</button>*/}
+        )
+    else {
+        return (
+            <div className={classes.gameContainer}>
+                <button className={`${classes.button} ${classes.buttonPrimary} ${classes.menu}`} onClick={() => setVsAI(false)}>Player vs Player</button>
+                <button className={`${classes.button} ${classes.buttonPrimary} ${classes.menu}`} onClick={() => setVsAI(true)}>Player vs AI</button>
             </div>
-        </div>
-    )
+        )
+    }
 }
 
 export default Game;

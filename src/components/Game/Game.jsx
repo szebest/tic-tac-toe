@@ -14,7 +14,6 @@ const Game = () => {
 
     const finishedGame = (message) => {
         setGameState(message)
-        console.log(message)
     }
 
     const restart = () => {
@@ -32,7 +31,9 @@ const Game = () => {
                 changeGameStateFunction={changeGameState}
                 finishedGame={finishedGame}/>
             <h1>{gameState === "" ? (playerMove === 1 ? "Players 1 move" : "Players 2 move") : gameState}</h1>
-            {gameState !== "" && <button onClick={restart}>Restart?</button>}
+            <div>
+                {gameState !== "" && <button className={`${classes.button} ${classes.buttonPrimary}`} onClick={restart}>Restart?</button>}
+            </div>
         </div>
     )
 }

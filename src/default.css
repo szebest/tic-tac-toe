@@ -1,7 +1,21 @@
+@font-face {
+    font-family: 'TicTacToe';
+    src: url('./assets/TicTacToe.ttf') format('truetype');
+}
+
 html, body, #root {
+    -moz-user-select: none; 
+    -webkit-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none;
+    -o-user-select: none;
     height: 100%;
 }
 
 body {
+    background-image: url("./assets/bg.png");
+    background-color: #aaa;
+    font-family: 'TicTacToe';
+    font-weight: bold;
     margin: 0;
 }

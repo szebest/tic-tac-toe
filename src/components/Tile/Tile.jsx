@@ -1,6 +1,6 @@
 import classes from './style/Tile.module.scss'
 
-const Tile = ({player, posx, posy,}) => {
+const Tile = ({player, posx, posy}) => {
     const styles = {
         transform: `translate(${posx}px, ${posy}px)` 
     }

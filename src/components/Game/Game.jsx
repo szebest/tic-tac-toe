@@ -71,8 +71,8 @@ const Game = () => {
                         <p>{vsAI ? "Player vs AI" : "Player vs Player"}</p>
                     </div>
                     <div className={classes.flex}>
-                        <p>x: {score.x}</p>
-                        <p>o: {score.o}</p>
+                        <p>X: {score.x}</p>
+                        <p>O: {score.o}</p>
                     </div>
                 </div>
                 <Board
@@ -82,7 +82,7 @@ const Game = () => {
                     changeGameStateFunction={changeGameState}
                     finishedGame={finishedGame}
                     vsAI={vsAI}/>
-                <h1 className={classes.infoText}>{gameState === "" ? (playerMove === 1 ? "Players 1 move" : "Players 2 move") : gameState}</h1>
+                <h1 className={classes.infoText}>{gameState === "" ? (playerMove === 1 ? "X's move" : "O's move") : gameState}</h1>
                 <div className={classes.buttonContainer}>
                     <button className={`${classes.button} ${classes.buttonPrimary}`} onClick={newGame}>New game</button>
                     <button className={`${classes.button} ${classes.buttonPrimary}`} onClick={resetAI}>Change game mode</button>

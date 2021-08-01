@@ -8,57 +8,112 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
     const [board, setBoard] = useState(Array(9).fill(0))
     const [line, setLine] = useState("")
 
-    useEffect(() => {
+    useEffect(async () => {
         if (restartGame) {
-            setBoard(Array(9).fill(0))
-            setLine("")
+            await setBoard([...Array(9).fill(0)])
+            await setLine("")
         }
     }, [restartGame])
 
-    const checkBoardState = (lastPlacedTile) => {
+    const checkWin = (board) => {
         // Check for cross win
-        const classNames = `${classes.grid} ${classes.fadeIn} ${board[lastPlacedTile] === 1 ? classes.gridBlue : classes.gridOrange}`
         if (board[0] === board[4] && board[4] === board[8] && board[4] !== 0) {
-            finishedGame(board[4] === 1 ? "Player 1 has won!" : "Player 2 has won!")
-            setLine(`<line x1="20" y1="20" x2="280" y2="280" class="${classNames}"></line>`)
-            return true
+            return {winningPlayer: board[4], x1: 20, y1: 20, x2: 280, y2: 280}
         }
 
         if (board[2] === board[4] && board[4] === board[6] && board[4] !== 0) {
-            finishedGame(board[4] === 1 ? "Player 1 has won!" : "Player 2 has won!")
-            setLine(`<line x1="280" y1="20" x2="20" y2="280" class="${classNames}"></line>`)
-            return true
+            return {winningPlayer: board[4], x1: 280, y1: 20, x2: 20, y2: 280}
         }
         
         // Check for row or column win
         for (let i = 0; i < 3; i++) {
             if (board[i * 3 + 0] === board[i * 3 + 1] && board[i * 3 + 1] === board[i * 3 + 2] && board[i * 3 + 1] !== 0) {
-                finishedGame(board[i * 3] === 1 ? "Player 1 has won!" : "Player 2 has won!")
-                setLine(`<line x1="20" y1="${50 + i * 100}" x2="280" y2="${50 + i * 100}" class="${classNames}"></line>`)
-                return true
+                return {winningPlayer: board[i * 3], x1: 20, y1: 50 + i * 100, x2: 280, y2: 50 + i * 100}
             }
 
             if (board[0 * 3 + i] === board[1 * 3 + i] && board[1 * 3 + i] === board[2 * 3 + i] && board[1 * 3 + i] !== 0) {
-                finishedGame(board[i] === 1 ? "Player 1 has won!" : "Player 2 has won!")
-                setLine(`<line x1="${50 + i * 100}" y1="20" x2="${50 + i * 100}" y2="280" class="${classNames}"></line>`)
-                return true
+                return {winningPlayer: board[i], x1: 50 + i * 100, y1: 20, x2: 50 + i * 100, y2: 280}
             }
         }
 
         // Check for a draw
-        if (!board.some((value) => value === 0)) {
-            finishedGame("Draw!")
-            return true
-        }
+        if (!board.some((value) => value === 0)) 
+            return {winningPlayer: 0}
         
         return false
     }
 
+    /*const minimax = (newBoard, player) => {
+        var availableSpots = newBoard
+
+        let winner = checkWin(newBoard)
+
+        if (winner) {
+            if (winner.winningPlayer === 1) {
+                return {score: -10};
+            } 
+            else if (winner.winningPlayer === 2) {
+                return {score: 10};
+            } 
+            else if (winner.winningPlayer === 0) {
+                return {score: 0};
+            }
+        }
+    
+        let moves = [];
+        for (let i = 0; i < availableSpots.length; i++) {
+            if (availableSpots[i] !== 0)
+                continue
+            
+            let move = {};
+            move.index = newBoard[i];
+            newBoard[i] = player;
+    
+            if (player === 2) {
+                let result = minimax(newBoard, 1);
+                move.score = result.score;
+            } 
+            else {
+                let result = minimax(newBoard, 2);
+                move.score = result.score;
+            }
+    
+            newBoard[i] = move.index;
+    
+            moves.push(move);
+        }
+    
+        let bestMove;
+        if (player === 1) {
+            let bestScore = -10000;
+            for(let i = 0; i < moves.length; i++) {
+                if (moves[i].score > bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = i;
+                }
+            }
+        } 
+        else {
+            let bestScore = 10000;
+            for(let i = 0; i < moves.length; i++) {
+                if (moves[i].score < bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = i;
+                }
+            }
+        }
+    
+        return moves[bestMove];
+    }*/
+
     useEffect(() => {
-        if (vsAI && playerMove === 2) {
+        if (restartGame && board.some(el => el !== 0)) {
+            setBoard(Array(9).fill(0))
+        }
+        else if (vsAI && playerMove === 2) {
             let hasMoved = false
             while (!hasMoved) {
-                let index = Math.floor(Math.random() * 8)
+                let index = Math.round(Math.random() * 8)
                 if (board[index] === 0) {
                     hasMoved = true
                     
@@ -67,12 +122,19 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
                         return prev
                     })
             
-                    if (!checkBoardState(index))
+                    const boardState = checkWin(board)
+
+                    if (boardState) {
+                        const classNames = `${classes.grid} ${classes.fadeIn} ${board[index] === 1 ? classes.gridBlue : classes.gridOrange}`
+                        finishedGame(boardState.winningPlayer === 1 ? "X has won!" : boardState.winningPlayer === 0 ? "Draw!" : "O has won!")
+                        setLine(`<line x1="${boardState.x1}" y1="${boardState.y1}" x2="${boardState.x2}" y2="${boardState.y2}" class="${classNames}"></line>`)
+                    }
+                    else
                         changeGameStateFunction()
                 }
             }
         }
-    }, [playerMove])
+    }, [playerMove, board])
 
     const handleClick = async (e) => {
         if (!canPlace)
@@ -92,8 +154,15 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
                 prev[index] = playerMove
                 return prev
             })
-    
-            if (!checkBoardState(index))
+
+            let boardState = checkWin(board)
+
+            if (boardState) {
+                const classNames = `${classes.grid} ${classes.fadeIn} ${board[index] === 1 ? classes.gridBlue : classes.gridOrange}`
+                finishedGame(boardState.winningPlayer === 1 ? "X has won!" : boardState.winningPlayer === 0 ? "Draw!" : "O has won!")
+                setLine(`<line x1="${boardState.x1}" y1="${boardState.y1}" x2="${boardState.x2}" y2="${boardState.y2}" class="${classNames}"></line>`)
+            }
+            else
                 changeGameStateFunction()
         }
     }

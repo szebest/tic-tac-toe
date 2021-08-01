@@ -43,68 +43,69 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
         return false
     }
 
-    /*const minimax = (newBoard, player) => {
-        var availableSpots = newBoard
-
-        let winner = checkWin(newBoard)
-
-        if (winner) {
-            if (winner.winningPlayer === 1) {
-                return {score: -10};
-            } 
-            else if (winner.winningPlayer === 2) {
-                return {score: 10};
-            } 
-            else if (winner.winningPlayer === 0) {
-                return {score: 0};
-            }
-        }
-    
-        let moves = [];
-        for (let i = 0; i < availableSpots.length; i++) {
-            if (availableSpots[i] !== 0)
-                continue
-            
-            let move = {};
-            move.index = newBoard[i];
-            newBoard[i] = player;
-    
-            if (player === 2) {
-                let result = minimax(newBoard, 1);
-                move.score = result.score;
-            } 
-            else {
-                let result = minimax(newBoard, 2);
-                move.score = result.score;
-            }
-    
-            newBoard[i] = move.index;
-    
-            moves.push(move);
-        }
-    
-        let bestMove;
-        if (player === 1) {
-            let bestScore = -10000;
-            for(let i = 0; i < moves.length; i++) {
-                if (moves[i].score > bestScore) {
-                    bestScore = moves[i].score;
-                    bestMove = i;
+    const bestMove = (board) => {
+        // AI to make its turn
+        let bestScore = -Infinity;
+        let move;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                // Is the spot available?
+                if (board[i * 3 + j] === 0) {
+                    board[i * 3 + j] = 2;
+                    let score = minimax(board, 0, false);
+                    board[i * 3 + j] = 0;
+                    if (score > bestScore || Math.random() >= 0.9) {
+                        bestScore = score;
+                        move = i * 3 + j
+                    }
                 }
             }
+        }
+        return move
+    }
+
+    const minimax = (board, depth, isMaximizing) => {
+        let scores = {
+            1: -1000 - depth,
+            2: 1000 - depth,
+            0: 0
+        };
+        let result = checkWin(board);
+        if (result !== false) {
+            return scores[result.winningPlayer];
+        }
+      
+        if (isMaximizing) {
+            let bestScore = -Infinity;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    // Is the spot available?
+                    if (board[i * 3 + j] === 0) {
+                        board[i * 3 + j] = 2;
+                        let score = minimax(board, depth + 1, false);
+                        board[i * 3 + j] = 0;
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+            }
+            return bestScore;
         } 
         else {
-            let bestScore = 10000;
-            for(let i = 0; i < moves.length; i++) {
-                if (moves[i].score < bestScore) {
-                    bestScore = moves[i].score;
-                    bestMove = i;
+            let bestScore = Infinity;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    // Is the spot available?
+                    if (board[i * 3 + j] === 0) {
+                        board[i * 3 + j] = 1;
+                        let score = minimax(board, depth + 1, true);
+                        board[i * 3 + j] = 0;
+                        bestScore = Math.min(score, bestScore);
+                    }
                 }
             }
+            return bestScore;
         }
-    
-        return moves[bestMove];
-    }*/
+    }
 
     useEffect(() => {
         if (restartGame && board.some(el => el !== 0)) {
@@ -113,7 +114,7 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
         else if (vsAI && playerMove === 2) {
             let hasMoved = false
             while (!hasMoved) {
-                let index = Math.round(Math.random() * 8)
+                let index = bestMove(board)
                 if (board[index] === 0) {
                     hasMoved = true
                     
@@ -127,7 +128,8 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
                     if (boardState) {
                         const classNames = `${classes.grid} ${classes.fadeIn} ${board[index] === 1 ? classes.gridBlue : classes.gridOrange}`
                         finishedGame(boardState.winningPlayer === 1 ? "X has won!" : boardState.winningPlayer === 0 ? "Draw!" : "O has won!")
-                        setLine(`<line x1="${boardState.x1}" y1="${boardState.y1}" x2="${boardState.x2}" y2="${boardState.y2}" class="${classNames}"></line>`)
+                        if (boardState.winningPlayer !== 0)
+                            setLine(`<line x1="${boardState.x1}" y1="${boardState.y1}" x2="${boardState.x2}" y2="${boardState.y2}" class="${classNames}"></line>`)
                     }
                     else
                         changeGameStateFunction()
@@ -160,7 +162,8 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
             if (boardState) {
                 const classNames = `${classes.grid} ${classes.fadeIn} ${board[index] === 1 ? classes.gridBlue : classes.gridOrange}`
                 finishedGame(boardState.winningPlayer === 1 ? "X has won!" : boardState.winningPlayer === 0 ? "Draw!" : "O has won!")
-                setLine(`<line x1="${boardState.x1}" y1="${boardState.y1}" x2="${boardState.x2}" y2="${boardState.y2}" class="${classNames}"></line>`)
+                if (boardState.winningPlayer !== 0)
+                    setLine(`<line x1="${boardState.x1}" y1="${boardState.y1}" x2="${boardState.x2}" y2="${boardState.y2}" class="${classNames}"></line>`)
             }
             else
                 changeGameStateFunction()

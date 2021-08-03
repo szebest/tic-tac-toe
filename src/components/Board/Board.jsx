@@ -57,6 +57,11 @@ const Board = ({ restartGame, canPlace, playerMove, changeGameStateFunction, fin
                     if (score > bestScore || Math.random() >= 0.9) {
                         bestScore = score;
                         move = i * 3 + j
+
+                        if (bestScore > 0) {
+                            i = 3
+                            j = 3
+                        }
                     }
                 }
             }
